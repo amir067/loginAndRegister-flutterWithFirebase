@@ -1,4 +1,4 @@
-# Flutter Classifieds application
+# Flutter E-Commerce application
 
 ## Users area Screen Shots
 
