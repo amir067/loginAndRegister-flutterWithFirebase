@@ -3,19 +3,22 @@ import 'package:e_commerce/Components/custom_textfield.dart';
 import 'package:e_commerce/Screens/signup_screen.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:e_commerce/Sevices/auth.dart';
 
 class LoginScreen extends StatefulWidget {
   static String id = 'LoginScreen';
-
   @override
   _LoginScreenState createState() => _LoginScreenState();
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  @override
+  final GlobalKey<FormState> _globalKey = GlobalKey<FormState>();
   Widget build(BuildContext context) {
     double height = MediaQuery.of(context).size.height;
     double width = MediaQuery.of(context).size.width;
+    String _email, _password;
+    final _auth = Auth();
+
     return Scaffold(
       backgroundColor: Colors.blueAccent,
       body: Padding(
@@ -38,72 +41,111 @@ class _LoginScreenState extends State<LoginScreen> {
                       fontFamily: 'Montserrat',
                       fontSize: 28,
                       letterSpacing: 5,
-                      fontWeight: FontWeight.w600
-                  ),
+                      fontWeight: FontWeight.w600),
                 ),
               ],
             ),
-            SizedBox(height:  height * 0.1,),
+            SizedBox(
+              height: height * 0.1,
+            ),
             Container(
               margin: EdgeInsets.all(28),
-              child: Column(
-                children: [
-                  Align(
-                    alignment: Alignment.centerLeft,
-                    child: Text(
-                      'Sign in',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontFamily: 'OpenSans Condensed',
-                        fontSize: 38,
-
+              child: Form(
+                key: _globalKey,
+                child: Column(
+                  children: [
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        'Sign in',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontFamily: 'OpenSans Condensed',
+                          fontSize: 38,
+                        ),
                       ),
                     ),
-                  ),
-                  SizedBox(height:  height * 0.02,),
-                  CustomTextField(icon: Icons.email_outlined, isPassword: false, label: "Email", ),
-                  SizedBox(height:  height * 0.02,),
-                  CustomTextField(icon: Icons.lock_open, isPassword: true, label: "Password", ),
-                  SizedBox(height:  height * 0.07,),
-                  CustomFlatButton(
-                    width: width,
-                    height: height * 0.0580,
-                    buttonColor: Colors.white,
-                    textColor: Colors.blueAccent ,
-                    text: 'Sign in' ,
-
-                  ),
-                  SizedBox(height:  height * 0.08,),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                          'Don\'t have an account ? ',
-                        style: TextStyle(
-                          fontSize: 18,
-                          color: Colors.white,
-                          fontFamily: 'Montserrat',
-                          fontWeight: FontWeight.w600
-
-                        ),
+                    SizedBox(
+                      height: height * 0.02,
+                    ),
+                    CustomTextField(
+                      icon: Icons.email_outlined,
+                      isPassword: false,
+                      label: "Email",
+                      onclick: (value) {
+                        _email = value;
+                      },
+                    ),
+                    SizedBox(
+                      height: height * 0.02,
+                    ),
+                    CustomTextField(
+                      icon: Icons.lock_open,
+                      isPassword: true,
+                      label: "Password",
+                      onclick: (value) {
+                        _password = value;
+                      },
+                    ),
+                    SizedBox(
+                      height: height * 0.07,
+                    ),
+                    Builder(
+                      builder: (context) => CustomFlatButton(
+                        width: width,
+                        height: height * 0.0580,
+                        buttonColor: Colors.white,
+                        textColor: Colors.blueAccent,
+                        text: 'Sign in',
+                        onpressed: () async {
+                          if (_globalKey.currentState.validate()) {
+                            try {
+                              _globalKey.currentState.save();
+                              final authResult =
+                                  await _auth.signIn(_email, _password);
+                              print(authResult);
+                            } catch (e) {
+                              Scaffold.of(context).showSnackBar(new SnackBar(
+                                content: new Text(e.message),
+                              ));
+                            }
+                          }
+                        },
                       ),
-                      GestureDetector(
-                        onTap: ()
-                        {Navigator.pushNamed(context, SignUpScreen.id);},
-                        child: Text(
-                          'Sign up',
+                    ),
+                    SizedBox(
+                      height: height * 0.08,
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          'Don\'t have an account ? ',
                           style: TextStyle(
-                            fontSize: 20,
-                            color: Colors.white,
-                            fontFamily: 'Montserrat',
-                            fontWeight: FontWeight.w800,
-                            decoration: TextDecoration.underline,
+                              fontSize: 18,
+                              color: Colors.white,
+                              fontFamily: 'Montserrat',
+                              fontWeight: FontWeight.w600),
+                        ),
+                        GestureDetector(
+                          onTap: () {
+                            Navigator.pushNamed(context, SignUpScreen.id);
+                          },
+                          child: Text(
+                            'Sign up',
+                            style: TextStyle(
+                              fontSize: 20,
+                              color: Colors.white,
+                              fontFamily: 'Montserrat',
+                              fontWeight: FontWeight.w800,
+                              decoration: TextDecoration.underline,
+                            ),
                           ),
                         ),
-                      ),
-                    ],
-                  )
-                ],
+                      ],
+                    )
+                  ],
+                ),
               ),
             )
           ],
