@@ -1,4 +1,4 @@
-# Flutter E-Commerce application
+# Flutter Login and Sign Up application
 
 ## Users area Screen Shots
 
